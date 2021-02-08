@@ -1,0 +1,46 @@
+{
+  "@type": "cn.cc.novel.model.RootModel",
+  "bookModel": {
+    "chapterListPattern": "//div[@class='listmain']//dd//a/@href",
+    "chapterNameListPattern": "//div[@class='listmain']//dd//a/text()"
+  },
+  "charset": "gbk",
+  "contentModel": {
+    "content": "//div[@id='content']/allText()",
+    "title": "//div[@class='content']//h1/allText()"
+  },
+  "headers": {
+    "@type": "java.util.HashMap",
+    "Cookie": "bcolor=; font=; size=; fontcolor=; width=; Hm_lvt_d980a3f9499907d0586dbac4f3207804=1612255141; Hm_lpvt_d980a3f9499907d0586dbac4f3207804=1612255144",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+    "Connection": "keep-alive",
+    "Referer": "https://www.bqkan.com/20_20994/7958137.html",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Site": "same-origin",
+    "Host": "www.bqkan.com",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Sec-Fetch-Mode": "navigate",
+    "Cache-Control": "max-age=0",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-User": "?1",
+    "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
+  },
+  "novelTypeUrlPattern": "//div[@class='nav']//li//a/@href/regex('/[a-z]{1,20}xiaoshuo/')",
+  "rootUrl": "https://www.bqkan.com/",
+  "searchModel": {
+    "keyMap": {
+      "@type": "java.util.HashMap",
+      "siteid": "biqukan.com",
+      "ie": "utf-8"
+    },
+    "novelNamePattern": "//div[@class='search-list']//a/text()",
+    "novelUrlPattern": "//div[@class='search-list']//a/@href",
+    "searchKey": "q",
+    "searchType": "POST"
+  },
+  "searchUrl": "https://so.biqusoso.com/s.php",
+  "typeModel": {
+    "novelUrlPattern": "//div[@class='l bd']//span[@class='s2']//a/@href"
+  }
+}

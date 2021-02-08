@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> 小说聚合 </title>
+    <style type="text/css">
+
+        a:hover{text-decoration:underline;}
+
+    </style>
+</head>
+<body>
+<font face="SimSun" size="5">
+
+    <!-- 搜索 -->
+<div id="ccsearch" style="text-align: center">
+    <input id="searchKey" name="searchKey" required="required">
+    <button id="submit"> 搜索 </button>
+</div>
+
+    <!-- 书籍列表，书名(显示章节) -->
+<div>
+    <button id="search-result" onclick="show('1')">搜索结果</button>
+    <button id="book-chapter" onclick="show('2')">章节</button>
+</div>
+    <br>
+    <!-- 小说列表 -->
+<div id="ccnovel" style="text-align: center">
+</div>
+    <br>
+    <!-- 章节 -->
+<div id="ccchapter" style="text-align: center">
+</div>
+    <br>
+    <!-- 目录 -->
+<div id="ccmenu" style="text-align: center;">
+
+    <!--<button>上一页</button>&nbsp;<button>目录</button>&nbsp;<button onclick="chapter('123')">下一页</button>
+    <button onclick="chapter('http://www.yulinzhanye.la/20/20304/508769.html')">蔡文姬的悲惨人生（01下）</button>-->
+
+</div>
+    <br>
+    <!-- 内容 -->
+<div id="cccontent" style="text-align: center">
+</div>
+    <br>
+</font>
+</body>
+<script src="js/jquery.min.js"></script>
+<script>
+
+    // 1. 搜索
+    $("#submit").click(function () {
+        //alert($("#searchKey").val());
+
+        $.ajax({
+            url: "/search",
+            type: "GET",
+            data:{
+                "searchKey":$("#searchKey").val()
+            },
+            async: false,
+            dataType: "json",
+            success: function (objReturn) {
+                var option = "";
+                var size = objReturn.data.length;
+                //alert(objReturn.code + size);
+                for(var i =0 ; i < size;i++){
+                    option += "<button onclick=\"book('" + objReturn.data[i].url + "')\">" + objReturn.data[i].name +  "</button><br>";
+                }
+                $("#ccnovel").html(option);
+            },
+            error: function (objReturn) {
+                // 跳转后台给我发邮件
+                alert("系统故障,请联系管理员");
+            }
+        })
+
+    });
+
+    var mapChapterList = {}; // 章节列表
+    var mapChapterListDESC = {}; // 章节列表
+    var mapChapter = {}; // 章节url >>> name 对应关系
+    var firstChapter = "first"; // 起始章节列表
+    // 2.点击书名，出现章节
+    function book(url) {
+        $.ajax({
+            url: "/book",
+            type: "GET",
+            data:{
+                "url": url
+            },
+            async: false,
+            dataType: "json",
+            success: function (objReturn) {
+                var option = "";
+                var size = objReturn.data.length;
+                //alert(objReturn.code + size);
+                for(var i =0 ; i < size;i++){
+                    var chapterUrl = objReturn.data[i].url;
+                    var chapterName = objReturn.data[i].name;
+                    option += "<a onclick =\"chapter('" + chapterUrl + "')\">" + chapterName +  "</a><br>";
+
+                    //
+                    mapChapterList[firstChapter] =  chapterUrl;
+                    mapChapter[chapterUrl] =  chapterName; //
+                    firstChapter = chapterUrl;
+
+                }
+
+                /*for(){
+                    mapChapterListDESC
+                }*/
+
+                $("#ccchapter").html(option);
+                // 隐藏小说列表
+                $("#ccnovel").attr("style","display: none");
+                $("#ccchapter").attr("style","");
+                $("#cccontent").attr("style","display: none");
+            },
+            error: function (objReturn) {
+                // 跳转后台给我发邮件
+                alert("系统故障,请联系管理员");
+            }
+        })
+    }
+
+    // 3.点击章节 岀内容
+    function chapter(url) {
+        $.ajax({
+            url: "/chapter",
+            type: "GET",
+            data:{
+                "url": url
+            },
+            async: false,
+            dataType: "json",
+            success: function (objReturn) {
+                  //alert("objReturn.code : " + objReturn.code);
+                  //alert(objReturn.code == '200');
+                  if(objReturn.code == '200'){
+                      // 加载章节内容
+                      $("#cccontent").html(objReturn.data);
+
+                      // 控制按钮
+                      var menu = "";
+                      var html = "";
+                      //var chapterName = mapChapter[url]; // 根据url取出name
+                      var nextChapterUrl = mapChapterList[url]; // 下一章url
+                      var nextChapterName = mapChapter[nextChapterUrl]; // 下一章name
+
+                      //alert(nextChapterUrl + " >>> " + nextChapterName);
+                      html += "<button onclick=\"showBookMenu()\">目录</button>&nbsp;";
+                      html += "<button onclick=\"chapter('" + nextChapterUrl + "')\">" + nextChapterName + "</button>";
+
+                      //alert("html:" + html);
+                      $("#ccmenu").html(html);
+                      /*$("#ccnovel").html(option);*/
+
+                      // 隐藏章节
+                      $("#ccchapter").attr("style","display: none");
+                      // 显示内容
+                      $("#cccontent").attr("style","text-align: center;");
+                  }else {
+                      alert(objReturn.value);
+                  }
+            },
+            error: function (objReturn) {
+                // 跳转后台给我发邮件
+                alert("系统故障,请联系管理员");
+            }
+        })
+    }
+
+    function showBookMenu() {
+        // 几种类型
+        /**
+         * 1. 搜索显示book
+         * 2. book 显示，关闭章节，内容
+         * 3. 章节关闭book，内容
+         * 4. 内容 关闭章节，关闭book
+         */
+        $("#ccchapter").attr("style","text-align: center;");
+        $("#ccmenu").attr("style","text-align: center;");
+        $("#cccontent").attr("style","display: none;");
+    }
+
+    function show(type) {
+        // 展示搜索结果
+        if(type=='1'){ //ccnovel
+            $("#ccnovel").attr("style","text-align: center;");
+            $("#ccmenu").attr("style","display: none;");
+        }// 展示目录
+        else if(type=='2'){
+            $("#ccnovel").attr("style","display: none;");
+            $("#ccmenu").attr("style","text-align: center;");
+            $("#ccchapter").attr("style","text-align: center;");
+            $("#cccontent").attr("style","display: none;");
+        }
+
+    }
+
+</script>
+</html>
